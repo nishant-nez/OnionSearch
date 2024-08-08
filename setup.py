@@ -10,7 +10,7 @@ setup(
     install_requires=["requests","argparse","termcolor","tqdm", "html5lib","bs4","PySocks"],
     description="OnionSearch is a script that scrapes urls on different .onion search engines.",
     include_package_data=True,
-    url='http://github.com/megadose/OnionSearch',
+    url='http://github.com/nishant-nez/OnionSearch',
     entry_points = {'console_scripts': ['onionsearch = onionsearch.core:scrape']},
     classifiers=[
         "Programming Language :: Python",
