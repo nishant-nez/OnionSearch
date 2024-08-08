@@ -1,11 +1,7 @@
 # OnionSearch
-👋 Hi there! For any professional inquiries or collaborations, please reach out to me at:
-megadose@protonmail.com
 
-📧 Preferably, use your professional email for correspondence. Let's keep it short and sweet, and all in English!
+A Python CLI scraping tool to scrape through the darkweb for given keywords.
 
-![PyPI](https://img.shields.io/pypi/v/onionsearch) ![PyPI - Week](https://img.shields.io/pypi/dw/onionsearch) ![PyPI - Downloads](https://static.pepy.tech/badge/onionsearch) ![PyPI - License](https://img.shields.io/pypi/l/onionsearch)
-#### For BTC Donations : 1FHDM49QfZX6pJmhjLE5tB2K6CaTLMZpXZ
 ## Educational purposes only
 
 OnionSearch is a Python3 script that scrapes urls on different ".onion" search engines.
@@ -16,45 +12,48 @@ OnionSearch is a Python3 script that scrapes urls on different ".onion" search e
 
 ![](https://github.com/megadose/gif-demo/raw/master/onionsearch.gif)
 
-
 ## 💡 Prerequisite
+
 [Python 3](https://www.python.org/download/releases/3.0/)
 
+[Tor](https://community.torproject.org/onion-services/setup/install/)
+
 ## 📚 Currently supported Search engines
+
 - ahmia
+- torch
 - darksearchio
 - onionland
 - notevil
-- darksearchenginer
-- phobos
 - onionsearchserver
 - torgle
-- onionsearchengine
-- tordex
 - tor66
-- tormax
 - haystack
-- multivac
-- evosearch
-- deeplink
+
+#### Currently Offline
+
+* darksearchio
+* darksearchenginer
+* phobos
+* onionsearchengine
+* tordex
+* tormax
+* multivac
+* evosearch
+* deeplink
 
 ## 🛠️ Installation
-### With PyPI
-
-```pip3 install onionsearch```
-
-### With Github
 
 ```bash
-git clone https://github.com/megadose/OnionSearch.git
+git clone https://github.com/nishant-nez/OnionSearch.git
 cd OnionSearch/
 python3 setup.py install
 ```
 
-
 ## 📈  Usage
 
 Help:
+
 ```
 usage: onionsearch [-h] [--proxy PROXY] [--output OUTPUT]
                   [--continuous_write CONTINUOUS_WRITE] [--limit LIMIT]
@@ -102,33 +101,37 @@ Please also note that the progress bars may not be properly displayed when `mp_u
 ### Examples
 
 To request all the engines for the word "computer":
+
 ```
 onionsearch "computer"
 ```
 
 To request all the engines excepted "Ahmia" and "Candle" for the word "computer":
+
 ```
 onionsearch "computer" --exclude ahmia candle
 ```
 
 To request only "Tor66", "DeepLink" and "Phobos" for the word "computer":
+
 ```
 onionsearch "computer" --engines tor66 deeplink phobos
 ```
 
 The same as previously but limiting to 3 the number of pages to load per engine:
+
 ```
 onionsearch "computer" --engines tor66 deeplink phobos --limit 3
 ```
 
 Please kindly note that the list of supported engines (and their keys) is given in the script help (-h).
 
-
 ### Output
 
 #### Default output
 
 By default, the file is written at the end of the process. The file will be csv formatted, containing the following columns:
+
 ```
 "engine","name of the link","url"
 ```
@@ -139,15 +142,19 @@ You can customize what will be flush in the output file by using the parameters 
 
 `--fields` allows you to add, remove, re-order the output fields. The default mode is show just below. Instead, you can for instance
 choose to output:
+
 ```
 "engine","name of the link","url","domain"
 ```
+
 by setting `--fields engine name link domain`.
 
 Or even, you can choose to output:
+
 ```
 "engine","domain"
 ```
+
 by setting `--fields engine domain`.
 
 These are examples but there are many possibilities.
@@ -160,12 +167,14 @@ The filename will be set by default to `output_$DATE_$SEARCH.txt`, where $DATE r
 characters of the search string.
 
 You can modify this filename by using `--output` when running the script, for instance:
+
 ```
 onionsearch "computer" --output "\$DATE.csv"
 onionsearch "computer" --output output.txt
 onionsearch "computer" --output "\$DATE_\$SEARCH.csv"
 ...
 ```
+
 (Note that it might be necessary to escape the dollar character.)
 
 In the csv file produced, the name and url strings are sanitized as much as possible, but there might still be some problems...
@@ -174,12 +183,13 @@ In the csv file produced, the name and url strings are sanitized as much as poss
 
 You can choose to progressively write to the output (instead of everything at the end, which would prevent
 losing the results if something goes wrong). To do so you have to use `--continuous_write True`, just as is:
+
 ```
 onionsearch "computer" --continuous_write True
 ```
+
 You can then use the `tail -f` (tail follow) Unix command to actively watch or monitor the results of the scraping.
-## Thank you to [Gobarigo](https://github.com/Gobarigo)
-## Thank you [mxrch](https://github.com/mxrch) for this logo
 
 ## 📝 License
+
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.fr.html)
