@@ -20,23 +20,24 @@ from bs4 import BeautifulSoup
 from urllib3.exceptions import ProtocolError
 
 ENGINES = {
-    "ahmia": "http://juhanurmihxlp77nkq76byazcldy2hlmovfu2epvl5ankdibsot4csyd.onion",  # Offline?
-    "darksearchio": "http://darksearch.io",
-    "onionland": "http://3bbad7fauom4d6sgppalyqddsqbf5u5p56b5k5uk2zxsy3d6ey2jobad.onion",
-    "notevil": "http://hss3uro2hsxfogfq.onion",  # Offline?
-    "darksearchenginer": "http://l4rsciqnpzdndt2llgjx3luvnxip7vbyj6k6nmdy4xs77tx6gkd24ead.onion",
-    "phobos": "http://phobosxilamwcg75xt22id7aywkzol6q6rfl2flipcqoc4e4ahima5id.onion",
+    "torch": "http://xmh57jrknzkhv6y3ls3ubitzfqnkrwxhopf5aygthi7d6rplyvk3noyd.onion", # new
+    "notevil": "http://notevilmtxf25uw7tskqxj6njlpebyrmlrerfv5hc4tuq7c7hilbyiqd.onion",  # new
+    "onionland": "http://3bbad7fauom4d6sgppalyqddsqbf5u5p56b5k5uk2zxsy3d6ey2jobad.onion", # new
+    "ahmia": "http://juhanurmihxlp77nkq76byazcldy2hlmovfu2epvl5ankdibsot4csyd.onion", 
     "onionsearchserver": "http://3fzh7yuupdfyjhwt3ugzqqof6ulbcl27ecev33knxe3u7goi3vfn2qqd.onion",
-    "torgle": "http://no6m4wzdexe3auiupv2zwif7rm6qwxcyhslkcnzisxgeiw6pvjsgafad.onion",  # "torgle" -> "Submarine"
-    "torgle1": "http://torgle5fj664v7pf.onion",  # Offline?
-    "onionsearchengine": "http://onionf4j3fwqpeo5.onion",  # Offline?
-    "tordex": "http://tordex7iie7z2wcg.onion",  # Offline?
     "tor66": "http://tor66sewebgixwhcqfnp5inzp5x5uohhdy3kvtnyfxc2e5mxiuh34iid.onion",
-    "tormax": "http://tormaxunodsbvtgo.onion",  # Offline?
     "haystack": "http://haystak5njsmn2hqkewecpaxetahtwhsbsa64jom2k22z5afxhnpxfid.onion",
-    "multivac": "http://multivacigqzqqon.onion",  # Offline?
-    "evosearch": "http://evo7no6twwwrm63c.onion",  # Offline?
-    "deeplink": "http://deeplinkdeatbml7.onion",  # Offline?
+    "torgle": "http://no6m4wzdexe3auiupv2zwif7rm6qwxcyhslkcnzisxgeiw6pvjsgafad.onion",  # "torgle" -> "Submarine"
+    "darksearchio": "http://darksearch.io", # offline
+    "darksearchenginer": "http://l4rsciqnpzdndt2llgjx3luvnxip7vbyj6k6nmdy4xs77tx6gkd24ead.onion", # offline
+    "phobos": "http://phobosxilamwcg75xt22id7aywkzol6q6rfl2flipcqoc4e4ahima5id.onion", # offline
+    "torgle1": "http://torgle5fj664v7pf.onion",  # offline
+    "onionsearchengine": "http://onionf4j3fwqpeo5.onion",  # offline
+    "tordex": "http://tordex7iie7z2wcg.onion",  # offline
+    "tormax": "http://tormaxunodsbvtgo.onion",  # offline
+    "multivac": "http://multivacigqzqqon.onion",  # offline
+    "evosearch": "http://evo7no6twwwrm63c.onion",  # offline
+    "deeplink": "http://deeplinkdeatbml7.onion",  # offline
 }
 
 desktop_agents = [
@@ -155,7 +156,7 @@ def darksearchio(searchstr):
     with requests.Session() as s:
         s.proxies = proxies
         s.headers = random_headers()
-        resp = s.get(darksearchio_url.format(quote(searchstr), 1))
+        resp = s.get(darksearchio_url.format(quote(searchstr), 1), verify=False)
 
         page_number = 1
         if resp.status_code == 200:
@@ -189,7 +190,51 @@ def darksearchio(searchstr):
 
 def onionland(searchstr):
     results = []
-    onionlandv3_url = supported_engines['onionland'] + "/search?q={}&page={}"
+    onionlandv3_url = supported_engines['onionland'] + "/search?q={}"
+    # max_nb_page = 100
+    # if args.limit != 0:
+    #     max_nb_page = args.limit
+
+    with requests.Session() as s:
+        s.proxies = proxies
+        s.headers = random_headers()
+
+        resp = s.get(onionlandv3_url.format(quote(searchstr)), verify=False)
+        soup = BeautifulSoup(resp.text, 'html5lib')
+
+        pos = get_proc_pos()
+        with tqdm(total=1, initial=0, desc=get_tqdm_desc("OnionLand", pos), position=pos) as progress_bar:
+
+            results = link_finder("onionland", soup)
+            progress_bar.update()
+
+    return results
+
+
+def notevil(searchstr):
+    results = []
+    notevil_url1 = supported_engines['notevil'] + "/index.php?q={}"
+    # notevil_url2 = supported_engines['notevil'] + "/index.php?q={}&hostLimit=20&start={}&numRows={}&template=0"
+    max_nb_page = 20
+    if args.limit != 0:
+        max_nb_page = args.limit
+
+    req = requests.get(notevil_url1.format(quote(searchstr)), proxies=proxies, headers=random_headers(), verify=False)
+
+    soup = BeautifulSoup(req.text, 'html5lib')
+
+    pos = get_proc_pos()
+    with tqdm(total=1, initial=0, desc=get_tqdm_desc("not Evil", pos), position=pos) as progress_bar:
+        # num_rows = 20
+        results = link_finder("notevil", soup)
+        progress_bar.update()
+
+    return results
+
+
+def torch(searchStr):
+    results = []
+    torch_url = supported_engines['torch'] + "/cgi-bin/omega/omega?P={}&%5B={}"
     max_nb_page = 100
     if args.limit != 0:
         max_nb_page = args.limit
@@ -198,77 +243,34 @@ def onionland(searchstr):
         s.proxies = proxies
         s.headers = random_headers()
 
-        resp = s.get(onionlandv3_url.format(quote(searchstr), 1), verify=False)
+        resp = s.get(torch_url.format(quote(searchStr), 1), proxies=proxies, headers=random_headers(), verify=False)
         soup = BeautifulSoup(resp.text, 'html5lib')
 
         page_number = 1
-        for i in soup.find_all('div', attrs={"class": "search-status"}):
-            approx_re = re.match(r"About ([,0-9]+) result(.*)",
-                                 clear(i.find('div', attrs={'class': "col-sm-12"}).get_text()))
-            if approx_re is not None:
-                nb_res = int((approx_re.group(1)).replace(",", ""))
-                results_per_page = 19
-                page_number = math.ceil(nb_res / results_per_page)
-                if page_number > max_nb_page:
-                    page_number = max_nb_page
+        matches = soup.find("center").get_text().split('\n')
+        for m in matches:
+            if 'No documents match' not in m:
+                if 'matches' in m:
+                    word = m.strip().split(' ')
+                    current = word[0]
+                    last = word[-2]
+
+                    page_number = math.ceil(float(last.replace(',', ''))/10)
+            else:
+                return results
 
         pos = get_proc_pos()
-        with tqdm(total=max_nb_page, initial=0, desc=get_tqdm_desc("OnionLand", pos), position=pos) as progress_bar:
-
-            results = link_finder("onionland", soup)
+        with tqdm(total=page_number, initial=0, desc=get_tqdm_desc("Torch", pos), position=pos) as progress_bar:
+            results = link_finder("torch", soup)
             progress_bar.update()
 
             for n in range(2, page_number + 1):
-                resp = s.get(onionlandv3_url.format(quote(searchstr), n), verify=False)
+                resp = s.get(torch_url.format(quote(searchStr), n), proxies=proxies, headers=random_headers(), verify=False)
                 soup = BeautifulSoup(resp.text, 'html5lib')
-                ret = link_finder("onionland", soup)
-                if len(ret) == 0:
-                    break
-                results = results + ret
+                results = results + link_finder("torch", soup)
                 progress_bar.update()
-
+    
     return results
-
-
-def notevil(searchstr):
-    results = []
-    notevil_url1 = supported_engines['notevil'] + "/index.php?q={}"
-    notevil_url2 = supported_engines['notevil'] + "/index.php?q={}&hostLimit=20&start={}&numRows={}&template=0"
-    max_nb_page = 20
-    if args.limit != 0:
-        max_nb_page = args.limit
-
-    # Do not use requests.Session() here (by experience less results would be got)
-    req = requests.get(notevil_url1.format(quote(searchstr)), proxies=proxies, headers=random_headers(), verify=False)
-    soup = BeautifulSoup(req.text, 'html5lib')
-
-    page_number = 1
-    last_div = soup.find("div", attrs={"style": "text-align:center"}).find("div", attrs={"style": "text-align:center"})
-    if last_div is not None:
-        for i in last_div.find_all("a"):
-            page_number = int(i.get_text())
-        if page_number > max_nb_page:
-            page_number = max_nb_page
-
-    pos = get_proc_pos()
-    with tqdm(total=page_number, initial=0, desc=get_tqdm_desc("not Evil", pos), position=pos) as progress_bar:
-        num_rows = 20
-        results = link_finder("notevil", soup)
-        progress_bar.update()
-
-        for n in range(2, page_number + 1):
-            start = (int(n - 1) * num_rows)
-            req = requests.get(notevil_url2.format(quote(searchstr), start, num_rows, verify=False),
-                               proxies=proxies,
-                               headers=random_headers())
-            soup = BeautifulSoup(req.text, 'html5lib')
-            results = results + link_finder("notevil", soup)
-            progress_bar.update()
-            time.sleep(1)
-
-    return results
-
-
 
 
 def darksearchenginer(searchstr):
@@ -816,18 +818,26 @@ def link_finder(engine_str, data_obj):
                 break
 
     if engine_str == "notevil":
-        for r in data_obj.find_all("p"):
-            r=r.find("a")
-            name = clear(r.get_text())
-            link = unquote(r["href"]).split('./r2d.php?url=')[1].split('&')[0]
+        for r in data_obj.find_all("div", class_="row"):
+            second_div = r.find_all("div")[1]
+            name = clear(second_div.get_text())
+            link = second_div.find('a')['href'] if second_div.find('a') else None
+            add_link()
+
+    if engine_str == "torch":
+        for r in data_obj.find_all("tr"):
+            td = r.find_all("td")[1].find("b").find("a")
+            name = clear(td.get_text())
+            link = td['href']
             add_link()
 
 
     if engine_str == "onionland":
-        for r in data_obj.select('.result-block .title a'):
-            if not r['href'].startswith('/ads/'):
-                name = clear(r.get_text())
-                link = unquote(unquote(get_parameter(r['href'], 'l')))
+        for r in data_obj.find_all("div", class_="result-block"):
+            a_tag = r.find("a", {"data-category": "text-result"})
+            if a_tag:
+                name = r.find("div", class_="title").get_text(strip=True)
+                link = r.find("div", class_="link").get_text(strip=True)
                 add_link()
 
     if engine_str == "onionsearchengine":
